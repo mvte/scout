@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+}
+
+version '1.0'
+
+repositories {
+    mavenCentral()
+    maven { // on kotlin dsl use `maven("https://m2.dv8tion.net/releases")` instead
+        url "https://m2.dv8tion.net/releases"
+    }
+    maven {
+        url "https://jitpack.io"
+    }
+    maven { url "https://m2.chew.pro/releases" }
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
+    implementation 'net.dv8tion:JDA:5.0.0-beta.2'
+    implementation 'com.github.sedmelluq:lavaplayer:PR650-SNAPSHOT'
+    implementation 'pw.chew:jda-chewtils:1.24.1'
+    implementation 'org.jsoup:jsoup:1.15.3'
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+}
+
+test {
+    useJUnitPlatform()
+}
