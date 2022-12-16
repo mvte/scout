@@ -23,17 +23,14 @@ user can choose to specify how much a price should change prior to being notifie
 ### bot logistics
 scout uses the jda library, a java wrapper for the discord REST api. 
 
-### sniper: parsing data 
-a snipe's type is determined by the website of the product specified by the user. scout will automatically determine if a given link is a supported
-`URLType`, and creates its corresponding `Snipe` object with the `SnipeFactory` class. any class extending `Snipe` must implement two things:
-1. how to parse the item's name
-2. how to determine if the item is in stock
+### parsing data 
+scout parses information about a product in two ways:
+1. directly from the product webpage
+2. creating a request to the product's website's api
 
-### modeling and persistence
-a user is represented by a `UserModel`, simply containing the user's id and their list of snipe/tracking requests. the `UserModelDatabase` uses a
-hash map to store all of the users that are registered. a user is registered when they send a message anywhere a bot can see.
-scout uses java's `Serializable` interface to write and read objects to file. this (will) include the `UserModelDatabase` and `RutgersCourseDatabase`. \
-*why don't i use a database?* idk how yet lol
+### notifying users
+checks for availability or a price change for each sniper/tracker are all done asynchronously to keep things fast. when a change in availability 
+or stock is detected a notification will be sent to a user's private dms.
 
 ## questions/issues
 scout is always being improved upon. if you have any questions or comments, message me on discord `@mvte#9597`
