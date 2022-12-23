@@ -25,7 +25,7 @@ public class Track implements Command {
             channel.sendMessage("incorrect amount of arguments. use the help command for usage").queue();
             return;
         }
-        if(Tracker.SUPPORTED_TRACKERS.contains(URLType.getURLType(args.get(0)))) {
+        if(!Tracker.SUPPORTED_TRACKERS.contains(URLType.getURLType(args.get(0)))) {
             channel.sendMessage("scout doesn't support tracking for this url. currently, we only support " +
                     "amazon items.").queue();
             return;
