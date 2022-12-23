@@ -1,6 +1,7 @@
 package scout.sniper;
 
 import scout.model.RutgersCourseDatabase;
+import scout.model.URLType;
 
 public class SnipeFactory {
 

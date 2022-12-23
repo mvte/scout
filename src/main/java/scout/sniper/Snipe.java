@@ -1,5 +1,6 @@
 package scout.sniper;
 
+import scout.model.URLType;
 import scout.model.UserModel;
 
 import java.io.Serializable;
@@ -28,6 +29,10 @@ public abstract class Snipe implements Serializable {
 
     public ArrayList<UserModel> getUsers() {
         return users;
+    }
+
+    public URLType getUrlType() {
+        return urlType;
     }
 
     public abstract String parseItemName();

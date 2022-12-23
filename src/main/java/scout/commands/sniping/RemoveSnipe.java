@@ -6,7 +6,7 @@ import scout.model.UserModel;
 import scout.model.UserModelDatabase;
 import scout.sniper.SnipeChecker;
 import scout.sniper.SnipeFactory;
-import scout.sniper.URLType;
+import scout.model.URLType;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -60,7 +60,7 @@ public class RemoveSnipe implements Command {
     }
 
     @Override
-    public String getHelp(String prefix) {
+    public String getHelp() {
         return "removes a snipe given the link that was provided to create it";
     }
 
