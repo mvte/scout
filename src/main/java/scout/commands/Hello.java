@@ -26,7 +26,7 @@ public class Hello implements Command {
         return "hello";
     }
 
-    public String getHelp(String prefix) {
+    public String getHelp() {
         return "say hello to scout!";
     }
 

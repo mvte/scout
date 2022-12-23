@@ -25,7 +25,7 @@ public class Coinflip implements Command {
 	}
 
 	@Override
-	public String getHelp(String prefix) {
+	public String getHelp() {
 		return "flips a coin";
 	}
 	

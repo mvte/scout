@@ -30,7 +30,7 @@ public class Support implements Command {
 	}
 
 	@Override
-	public String getHelp(String prefix) {
+	public String getHelp() {
 		return "provides ways to support maestro!";
 	}
 	

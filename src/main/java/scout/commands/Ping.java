@@ -21,7 +21,7 @@ public class Ping implements Command {
 		return "ping";
 	}
 
-	public String getHelp(String prefix) {
+	public String getHelp() {
 		return "displays \"pong!\" along with the maestro's ping to discord's servers";
 	}
 	

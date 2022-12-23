@@ -16,7 +16,7 @@ public class Help implements Command {
     }
 
     @Override
-    public String getHelp(String prefix) {
+    public String getHelp() {
         return null;
     }
 }

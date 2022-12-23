@@ -28,10 +28,9 @@ public interface Command {
 
     /**
      * Returns the help message when .help [command] is called
-     * @param prefix the server's prefix
      * @return help message
      */
-    String getHelp(String prefix);
+    String getHelp();
 
     /**
      * Returns the list of aliases a certain command has. Allows the same command to be invoked with other arguments.
