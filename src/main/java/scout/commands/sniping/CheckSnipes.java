@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-public class Check implements Command {
+public class CheckSnipes implements Command {
     @Override
     public void handle(MessageReceivedEvent event, List<String> args) {
         MessageChannel channel = event.getChannel();
@@ -35,18 +35,23 @@ public class Check implements Command {
             if(event.isFromGuild())
                 channel.sendMessage("your snipe list has been sent to your dms").queue();
         } catch(NullPointerException e) {
-            channel.sendMessage("your dms are closed. please open them to receive your snipe list and snipe notifications").queue();
+            channel.sendMessage("your dms are closed. please open them to receive your snipe list and other notifications from scout").queue();
         }
 
     }
 
     @Override
     public String getName() {
-        return "check";
+        return "checksnipes";
     }
 
     @Override
-    public String getHelp(String prefix) {
+    public String getHelp() {
         return "gives list of snipes";
+    }
+
+    @Override
+    public List<String> getAliases() {
+        return List.of("cs");
     }
 }

@@ -3,8 +3,11 @@ package scout;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.Nullable;
 import scout.commands.*;
-import scout.commands.sniping.Check;
+import scout.commands.admin.ForceNotify;
+import scout.commands.sniping.CheckSnipes;
 import scout.commands.sniping.RemoveSnipe;
+import scout.commands.tracking.CheckTrackers;
+import scout.commands.tracking.RemoveTracker;
 import scout.commands.tracking.Track;
 import scout.commands.sniping.Snipe;
 
@@ -24,8 +27,11 @@ public class CommandManager {
         addCommand(new Coinflip());
         addCommand(new Snipe());
         addCommand(new RemoveSnipe());
-        addCommand(new Check());
+        addCommand(new CheckSnipes());
         addCommand(new Track());
+        addCommand(new CheckTrackers());
+        addCommand(new RemoveTracker());
+        addCommand(new ForceNotify());
     }
 
     /**
@@ -33,7 +39,7 @@ public class CommandManager {
      * @param cmd The command to be added
      */
     private void addCommand(Command cmd) {
-        // If the command already exists, then we don't want to add it to the command list.
+        // if the command already exists, then we don't want to add it to the command list.
         boolean exists = this.commands.stream().anyMatch((it) -> it.getName().equalsIgnoreCase(cmd.getName()));
 
         if (exists)
@@ -74,7 +80,7 @@ public class CommandManager {
         String[] split = event.getMessage().getContentRaw().replaceFirst("(?i)" + Pattern.quote(prefix), "")
                 .split("\\s+");
 
-        // The command being invoked
+        // the command being invoked
         String invoke = split[0].toLowerCase();
         Command cmd = this.getCommand(invoke);
 
