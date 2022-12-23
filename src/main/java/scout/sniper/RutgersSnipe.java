@@ -5,6 +5,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import scout.model.RutgersCourseDatabase;
 import scout.model.RutgersSection;
+import scout.model.URLType;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -63,7 +64,7 @@ public class RutgersSnipe extends Snipe {
             return "ITEM_NAME_NOT_FOUND";
         }
 
-        return String.format("%s - section %s | %s", rs.getIndex(), rs.getSection(), rs.getTitle());
+        return String.format("%s | section %s | %s", rs.getIndex(), rs.getSection(), rs.getTitle()).toLowerCase();
     }
 
     @Override
