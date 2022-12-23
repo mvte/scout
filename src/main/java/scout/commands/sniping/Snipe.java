@@ -58,7 +58,7 @@ public class Snipe implements Command {
 	}
 
 	@Override
-	public String getHelp(String prefix) {
+	public String getHelp() {
 		return "the bot will send you a message when an item you want is in stock. currently, this bot only supports " +
 				"sniping best buy and gamestop links, and rutgers course codes \nusage: `.snipe <link/code>`";
 	}
