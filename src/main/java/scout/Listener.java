@@ -20,6 +20,7 @@ public class Listener extends ListenerAdapter {
         if(event.getMessage().getContentRaw().equalsIgnoreCase(prefix + "shutdown") && event.getAuthor().getId().equals(Config.get("owner_id"))) {
             event.getChannel().sendMessage("shutting down").complete();
             System.out.println("shutting down");
+            Scout.save();
             event.getJDA().shutdown();
             System.exit(0);
         }

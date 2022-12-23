@@ -1,35 +1,46 @@
 package scout;
 
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.dv8tion.jda.api.utils.ChunkingFilter;
-import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import scout.model.RutgersCourseDatabase;
+import scout.model.UserModelDatabase;
+import scout.sniper.SnipeChecker;
+import scout.tracker.TrackerChecker;
 
-import javax.security.auth.login.LoginException;
-import java.sql.SQLException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class Scout {
     public static JDA bot;
-    public static String prefix = Config.get("PREFIX");
     public static ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
 
-    private Scout() throws LoginException, SQLException {
-
+    private Scout() {
         bot = JDABuilder.createDefault(Config.get("token"))
                 .setStatus(OnlineStatus.ONLINE)
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
                 .addEventListeners(new Listener())
                 .build();
+        load();
+    }
+
+    private void load() {
+        TrackerChecker.getInstance();
+        SnipeChecker.getInstance();
+        RutgersCourseDatabase.getInstance().loadFromEndpoint();
+        UserModelDatabase.getInstance().loadFromFile();
+    }
+
+    public static void save() {
+        TrackerChecker.getInstance().saveTrackers();
+        SnipeChecker.getInstance().saveSnipes();
+        RutgersCourseDatabase.getInstance().saveToFile();
+        UserModelDatabase.getInstance().saveToFile();
     }
 
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         new Scout();
     }
 
