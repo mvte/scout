@@ -27,7 +27,6 @@ public class RutgersCourseDatabase {
     public static RutgersCourseDatabase getInstance() {
         if(INSTANCE == null) {
             INSTANCE = new RutgersCourseDatabase();
-            INSTANCE.loadFromEndpoint();
         }
         return INSTANCE;
     }
