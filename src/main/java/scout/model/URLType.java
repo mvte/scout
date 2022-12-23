@@ -1,4 +1,4 @@
-package scout.sniper;
+package scout.model;
 
 public enum URLType {
 
