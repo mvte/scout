@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import scout.Scout;
 import scout.model.UserModel;
 
+import java.io.*;
 import java.util.HashSet;
 import java.util.concurrent.*;
 
@@ -14,12 +15,13 @@ import java.util.concurrent.*;
  * Singleton class that will check all snipes for stock.
  */
 public class SnipeChecker {
-
+    private static final String filename = "snipes.ser";
     private static SnipeChecker INSTANCE;
-    private final HashSet<Snipe> snipes;
+    private HashSet<Snipe> snipes;
 
     private SnipeChecker() {
         this.snipes = new HashSet<>();
+        loadSnipes();
         run();
     }
 
@@ -78,6 +80,35 @@ public class SnipeChecker {
                     .flatMap(channel -> channel.sendMessageEmbeds(eb.setFooter(jdaUser.getName()).build())
                             .setComponents(ar))
                     .queue();
+        }
+    }
+
+    private void loadSnipes() {
+        if(!new File(filename).exists()) {
+            return;
+        }
+        try (
+                FileInputStream fin = new FileInputStream(filename);
+                ObjectInputStream in = new ObjectInputStream(fin))
+        {
+            snipes = (HashSet<Snipe>)in.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveSnipes() {
+        if(snipes.isEmpty()) {
+            return;
+        }
+
+        try(
+                FileOutputStream fout = new FileOutputStream(filename);
+                ObjectOutput oos = new ObjectOutputStream(fout))
+        {
+            oos.writeObject(snipes);
+        } catch(Exception e) {
+            e.printStackTrace();
         }
     }
 }
