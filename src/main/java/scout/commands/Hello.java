@@ -6,7 +6,11 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
-public class Hello implements Command {
+public class Hello extends Command {
+
+    public Hello(CommandCategory category) {
+        super(category);
+    }
 
     public void handle(MessageReceivedEvent event, List<String> args) {
         MessageChannel channel = event.getChannel();
