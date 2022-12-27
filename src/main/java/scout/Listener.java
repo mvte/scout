@@ -1,13 +1,16 @@
 package scout;
 
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 import scout.model.UserModel;
 import scout.model.UserModelDatabase;
 
 public class Listener extends ListenerAdapter {
 
     private final CommandManager manager = new CommandManager();
+    public static final long MEMBER_ROLE = 1053226501920800799L;
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event)
@@ -30,6 +33,12 @@ public class Listener extends ListenerAdapter {
         if(event.getMessage().getContentRaw().startsWith(prefix)) {
             manager.handle(event, prefix);
         }
+    }
+
+    @Override
+    public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
+        event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRoleById(MEMBER_ROLE)).queue();
+        UserModelDatabase.getInstance().addUserIfNotExist(new UserModel(event.getMember().getIdLong()));
     }
 
 }
