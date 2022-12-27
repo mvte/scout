@@ -4,6 +4,7 @@ public enum CommandCategory {
 
     TRACKER,
     SNIPER,
-    BASIC;
+    BASIC,
+    ADMIN
 
 }

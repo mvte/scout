@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import scout.Scout;
 import scout.commands.Command;
+import scout.commands.CommandCategory;
 import scout.model.URLType;
 import scout.model.UserModel;
 import scout.model.UserModelDatabase;
@@ -14,7 +15,11 @@ import scout.tracker.TrackerFactory;
 
 import java.util.List;
 
-public class Track implements Command {
+public class Track extends Command {
+
+    public Track(CommandCategory category) {
+        super(category);
+    }
 
     @Override
     public void handle(MessageReceivedEvent event, List<String> args) {
@@ -25,14 +30,15 @@ public class Track implements Command {
             channel.sendMessage("incorrect amount of arguments. use the help command for usage").queue();
             return;
         }
-        if(Tracker.SUPPORTED_TRACKERS.contains(URLType.getURLType(args.get(0)))) {
+        URLType urlType = URLType.getURLType(args.get(0));
+        if(urlType != null && !Tracker.SUPPORTED_TRACKERS.contains(urlType)) {
             channel.sendMessage("scout doesn't support tracking for this url. currently, we only support " +
                     "amazon items.").queue();
             return;
         }
 
         Tracker tracker;
-        if((tracker = TrackerFactory.createTracker(args.get(0))) == null) {
+        if(urlType == null || (tracker = TrackerFactory.createTracker(args.get(0))) == null) {
             channel.sendMessage("something went wrong creating your tracker, try again").queue();
             return;
         }

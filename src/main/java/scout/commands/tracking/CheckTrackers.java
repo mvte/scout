@@ -6,13 +6,18 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import scout.Scout;
 import scout.commands.Command;
+import scout.commands.CommandCategory;
 import scout.model.UserModel;
 import scout.model.UserModelDatabase;
 import scout.tracker.Tracker;
 
 import java.util.List;
 
-public class CheckTrackers implements Command {
+public class CheckTrackers extends Command {
+    public CheckTrackers(CommandCategory category) {
+        super(category);
+    }
+
     @Override
     public void handle(MessageReceivedEvent event, List<String> args) {
         MessageChannel channel = event.getChannel();

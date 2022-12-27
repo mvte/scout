@@ -5,9 +5,13 @@ import java.util.List;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class Ping implements Command {
+public class Ping extends Command {
 
-	public void handle(MessageReceivedEvent event, List<String> args) {
+    public Ping(CommandCategory category) {
+		super(category);
+    }
+
+    public void handle(MessageReceivedEvent event, List<String> args) {
 		JDA bot = event.getJDA();
 		
 		bot.getRestPing().queue( (time) ->

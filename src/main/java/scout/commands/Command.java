@@ -8,37 +8,49 @@ import java.util.List;
  * Represents a command invocation. Every command must implement this interface,
  * and then be registered in the command manager.
  */
-public interface Command {
+public abstract class Command {
 
-    CommandCategory category = CommandCategory.BASIC;
+    protected CommandCategory category;
+
+    public Command(CommandCategory category) {
+        this.category = category;
+    }
 
     /**
      * Defines behavior for a command.
      * @param event, contains all context for the message (guild, user, member, etc.)
      * @param args, contains all arguments of the command omitting the first prefixed command
      */
-    void handle(MessageReceivedEvent event, List<String> args);
+    public abstract void handle(MessageReceivedEvent event, List<String> args);
 
     /**
      * Gets the name of the command. Will be used by CommandManager to identify when a command
      * is called.
      * @return the name of the command
      */
-    String getName();
+    public abstract String getName();
 
     /**
      * Returns the help message when .help [command] is called
      * @return help message
      */
-    String getHelp();
+    public abstract String getHelp();
 
     /**
      * Returns the list of aliases a certain command has. Allows the same command to be invoked with other arguments.
      * Please ensure that no two commands have duplicate aliases.
      * @return the list of aliases for a command
      */
-    default List<String> getAliases() {
+    public List<String> getAliases() {
         return List.of();
+    }
+
+    /**
+     * Returns the category of a command. This is used to organize commands in the .help command.
+     * @return the category of a command
+     */
+    CommandCategory getCategory() {
+        return category;
     }
 
 }

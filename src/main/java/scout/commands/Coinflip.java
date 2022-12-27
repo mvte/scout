@@ -5,7 +5,11 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class Coinflip implements Command {
+public class Coinflip extends Command {
+
+	public Coinflip(CommandCategory category) {
+		super(category);
+	}
 
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {

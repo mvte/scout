@@ -6,7 +6,11 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class Support implements Command {
+public class Support extends Command {
+
+	public Support(CommandCategory category) {
+		super(category);
+	}
 
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {

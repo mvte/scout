@@ -5,6 +5,7 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import scout.Scout;
 import scout.commands.Command;
+import scout.commands.CommandCategory;
 import scout.model.UserModel;
 import scout.model.UserModelDatabase;
 import scout.sniper.SnipeChecker;
@@ -12,7 +13,11 @@ import scout.sniper.SnipeFactory;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class Snipe implements Command {
+public class Snipe extends Command {
+
+	public Snipe(CommandCategory category) {
+		super(category);
+	}
 
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {

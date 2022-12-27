@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import scout.commands.Command;
+import scout.commands.CommandCategory;
 import scout.model.URLType;
 import scout.model.UserModel;
 import scout.model.UserModelDatabase;
@@ -12,7 +13,11 @@ import scout.tracker.TrackerFactory;
 
 import java.util.List;
 
-public class RemoveTracker implements Command {
+public class RemoveTracker extends Command {
+    public RemoveTracker(CommandCategory category) {
+        super(category);
+    }
+
     @Override
     public void handle(MessageReceivedEvent event, List<String> args) {
         MessageChannel channel = event.getChannel();
