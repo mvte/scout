@@ -88,15 +88,15 @@ public class UserModel implements Serializable {
         ActionRow ar = ActionRow.of(Button.link(tracker.getUrl(), "go to"));
 
         try {
+            assert jdaUser != null;
             jdaUser.openPrivateChannel()
                     .flatMap(channel -> channel.sendMessageEmbeds(eb.build())
                             .setComponents(ar))
                     .queue();
-        } catch (NullPointerException e) {
+            System.out.println("notified user " + jdaUser.getName() + " of price change for " + tracker.getItemName());
+        } catch (AssertionError e) {
             System.out.println("user not found");
         }
-
-        System.out.println("notified user " + jdaUser.getName() + " of price change for " + tracker.getItemName());
     }
 
     @Override
