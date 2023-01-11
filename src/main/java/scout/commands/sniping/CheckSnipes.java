@@ -9,6 +9,7 @@ import scout.model.UserModelDatabase;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import scout.sniper.SnipeChecker;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class CheckSnipes extends Command {
             .setFooter(jdaUser.getName())
             .setTimestamp(java.time.Instant.now());
 
-        for(scout.sniper.Snipe s : user.getSnipes()) {
+        for(scout.sniper.Snipe s : SnipeChecker.getInstance().getUserSnipes(user)) {
             eb.addField(s.getItemName(), "[link](" + s.getUrl() + ")", false);
         }
 

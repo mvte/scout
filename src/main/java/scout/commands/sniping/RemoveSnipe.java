@@ -48,7 +48,6 @@ public class RemoveSnipe extends Command {
         }
 
         realSnipe.getUsers().remove(user);
-        user.getSnipes().remove(realSnipe);
         SnipeChecker.getInstance().clearEmptySnipes();
 
         EmbedBuilder eb = new EmbedBuilder()

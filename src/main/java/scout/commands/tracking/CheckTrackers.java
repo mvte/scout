@@ -10,6 +10,7 @@ import scout.commands.CommandCategory;
 import scout.model.UserModel;
 import scout.model.UserModelDatabase;
 import scout.tracker.Tracker;
+import scout.tracker.TrackerChecker;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class CheckTrackers extends Command {
                 .setFooter(jdaUser.getName())
                 .setTimestamp(java.time.Instant.now());
 
-        for(Tracker t : user.getTrackers()) {
+        for(Tracker t : TrackerChecker.getInstance().getUserTrackers(user)) {
             String priceFound = t.getCurrentPrice() == -2 ? "PRICE_NOT_FOUND" : String.format("$%.2f", t.getCurrentPrice());
             String statusMessage = String.format("[%s](%s)%n last price change: %s", priceFound, t.getUrl(), t.getLastPriceChange());
             eb.addField(t.getItemName(), statusMessage, false);

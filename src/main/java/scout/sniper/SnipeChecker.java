@@ -8,6 +8,7 @@ import scout.Scout;
 import scout.model.UserModel;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.concurrent.*;
 
@@ -73,7 +74,6 @@ public class SnipeChecker {
         ActionRow ar = ActionRow.of(Button.link(snipe.getUrl(), "go to"));
 
         for(UserModel user : snipe.getUsers()) {
-            user.getSnipes().remove(snipe);
             User jdaUser = Scout.bot.getUserById(user.getId());
 
             jdaUser.openPrivateChannel()
@@ -110,5 +110,15 @@ public class SnipeChecker {
         } catch(Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public ArrayList<Snipe> getUserSnipes(UserModel user) {
+        ArrayList<Snipe> userSnipes = new ArrayList<>();
+        for(Snipe s : snipes) {
+            if(s.getUsers().contains(user)) {
+                userSnipes.add(s);
+            }
+        }
+        return userSnipes;
     }
 }

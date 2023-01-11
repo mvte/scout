@@ -13,47 +13,21 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class UserModel implements Serializable {
+    //TODO: notify should only take an embed/message, not the snipe or tracker
 
     /** unique user id from discord */
     private final long id;
     /** snipe list*/
-    private final ArrayList<Snipe> snipes;
-    private final ArrayList<Tracker> trackers;
 
     public UserModel(long id) {
         this.id = id;
-        snipes = new ArrayList<>();
-        trackers = new ArrayList<>();
     }
 
     public long getId() {
         return id;
     }
 
-    public ArrayList<Snipe> getSnipes() {
-        return snipes;
-    }
-
-    public boolean addSnipe(Snipe snipe) {
-        if(snipes.contains(snipe)) {
-            return false;
-        }
-        return snipes.add(snipe);
-    }
-
-    public boolean addTracker(Tracker tracker) {
-        if(trackers.contains(tracker)) {
-            return false;
-        }
-        return trackers.add(tracker);
-    }
-
-    public ArrayList<Tracker> getTrackers() {
-        return trackers;
-    }
-
     public void notifyUser(Snipe snipe) {
-        snipes.remove(snipe);
         User jdaUser = Scout.bot.getUserById(id);
 
         String stockMessage = snipe.getUrlType() == URLType.RUTGERS ? " is open!" : " is in stock!";
@@ -110,9 +84,5 @@ public class UserModel implements Serializable {
     @Override
     public int hashCode() {
         return (int)id;
-    }
-
-    public void removeTracker(Tracker tracker) {
-        trackers.remove(tracker);
     }
 }

@@ -45,7 +45,6 @@ public class RemoveTracker extends Command {
         }
 
         realTracker.getUsers().remove(user);
-        user.getTrackers().remove(realTracker);
         TrackerChecker.getInstance().clearEmptyTrackers();
 
         EmbedBuilder eb = new EmbedBuilder()

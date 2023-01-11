@@ -30,23 +30,18 @@ public class Snipe extends Command {
 			return;
 		}
 
-		scout.sniper.Snipe snipe = snipeFactory.createSnipe(args.get(0));
+		scout.sniper.Snipe snipe = snipeFactory.createSnipe(args.get(0), true);
 		if(snipe == null) {
 			channel.sendMessage("something went wrong creating your snipe! check your url?").queue();
 			return;
 		}
 
 		UserModel user = UserModelDatabase.getInstance().getUser(userId);
-		if(!user.addSnipe(snipe)) {
+		if(snipe.getUsers().contains(user)) {
 			channel.sendMessage("you are already sniping this item!").queue();
 			return;
 		}
-
-		if(SnipeChecker.getInstance().addSnipe(snipe)) {
-			snipe.addUser(user);
-		} else {
-			SnipeChecker.getInstance().getSnipe(snipe).addUser(user);
-		}
+		snipe.getUsers().add(user);
 
 		EmbedBuilder eb = new EmbedBuilder()
 				.setTitle("successfully added snipe request")

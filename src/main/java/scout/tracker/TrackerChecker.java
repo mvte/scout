@@ -1,8 +1,10 @@
 package scout.tracker;
 
 import scout.Scout;
+import scout.model.UserModel;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
@@ -90,5 +92,14 @@ public class TrackerChecker {
 
     public void clearEmptyTrackers() {
         trackers.removeIf(t -> t.getUsers().isEmpty());
+    }
+
+    public ArrayList<Tracker> getUserTrackers(UserModel userModel) {
+        ArrayList<Tracker> userTrackers = new ArrayList<>();
+        for(Tracker t : trackers) {
+            if(t.getUsers().contains(userModel))
+                userTrackers.add(t);
+        }
+        return userTrackers;
     }
 }

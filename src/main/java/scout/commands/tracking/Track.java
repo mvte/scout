@@ -37,6 +37,8 @@ public class Track extends Command {
             return;
         }
 
+        channel.sendMessage("attempting to create tracker...").queue();
+
         Tracker tracker;
         if(urlType == null || (tracker = TrackerFactory.createTracker(args.get(0))) == null) {
             channel.sendMessage("something went wrong creating your tracker, try again").queue();
@@ -44,7 +46,7 @@ public class Track extends Command {
         }
 
         UserModel user = UserModelDatabase.getInstance().getUser(userId);
-        if(!user.addTracker(tracker)) {
+        if(TrackerChecker.getInstance().getUserTrackers(user).contains(tracker)) {
             channel.sendMessage("you are already tracking this item!").queue();
             return;
         }
