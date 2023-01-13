@@ -15,6 +15,9 @@ public class TrackerFactory {
             case AMAZON:
                 tracker = new AmazonTracker(url);
                 break;
+            case NEWEGG:
+                tracker = new NeweggTracker(url);
+                break;
             default:
                 return null;
         }
@@ -23,19 +26,7 @@ public class TrackerFactory {
     }
 
     public static Tracker createTracker(String url, boolean addToChecker) {
-        URLType urlType = URLType.getURLType(url);
-
-        if(urlType == null)
-            return null;
-
-        Tracker tracker;
-        switch(urlType) {
-            case AMAZON:
-                tracker = new AmazonTracker(url);
-                break;
-            default:
-                return null;
-        }
+        Tracker tracker = createTracker(url);
 
         if(!addToChecker) {
             return tracker;

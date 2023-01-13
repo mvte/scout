@@ -13,9 +13,6 @@ public class SnipeFactory {
 
         Snipe snipe;
         switch(url) {
-            case AMAZON:
-                snipe = new AmazonSnipe(urlString);
-                break;
             case BEST_BUY:
                 snipe = new BestBuySnipe(urlString);
                 break;
@@ -35,29 +32,7 @@ public class SnipeFactory {
     }
 
     public Snipe createSnipe(String urlString, boolean addToChecker) {
-        URLType url = URLType.getURLType(urlString);
-        if(url == null)
-            return null;
-
-        Snipe snipe;
-        switch(url) {
-            case AMAZON:
-                snipe = new AmazonSnipe(urlString);
-                break;
-            case BEST_BUY:
-                snipe = new BestBuySnipe(urlString);
-                break;
-            case GAMESTOP:
-                snipe = new GameStopSnipe(urlString);
-                break;
-            case RUTGERS:
-                if(RutgersCourseDatabase.getInstance().containsSection(urlString)) {
-                    snipe = new RutgersSnipe(urlString);
-                    break;
-                }
-            default:
-                return null;
-        }
+        Snipe snipe = createSnipe(urlString);
 
         if(!addToChecker) {
             return snipe;
