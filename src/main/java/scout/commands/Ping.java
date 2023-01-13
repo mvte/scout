@@ -26,7 +26,7 @@ public class Ping extends Command {
 	}
 
 	public String getHelp() {
-		return "displays \"pong!\" along with the maestro's ping to discord's servers";
+		return "displays \"pong!\" along with the scout's ping to discord's servers";
 	}
 	
 
