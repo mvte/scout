@@ -24,7 +24,7 @@ public class TrackerChecker {
     }
 
     private void run() {
-        Scout.service.scheduleAtFixedRate(this::checkTrackers, 0, 1, TimeUnit.MINUTES);
+        Scout.service.scheduleAtFixedRate(this::checkTrackers, 0, 8, TimeUnit.MINUTES);
     }
 
     private void checkTrackers() {
