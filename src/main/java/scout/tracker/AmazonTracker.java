@@ -3,28 +3,18 @@ package scout.tracker;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import scout.model.URLType;
-
-import java.util.ArrayList;
 
 public class AmazonTracker extends Tracker {
 
     private final String asin;
 
     public AmazonTracker(String url) {
-        this.url = url;
-        this.itemName = parseItemName();
+        super(url);
         this.asin = parseAsin();
-        this.urlType = URLType.getURLType(url);
-        this.users = new ArrayList<>();
-        this.currentPrice = parsePrice();
-        this.newPrice = currentPrice;
-        this.lastPriceChange = PRICE_NEVER_CHANGED;
     }
 
     private String parseAsin() {
         String[] split = url.split("/");
-        System.out.println("ASIN: " + split[5].substring(0, 10));
         return split[5].substring(0,10);
     }
 

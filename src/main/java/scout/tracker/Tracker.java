@@ -9,10 +9,14 @@ import java.util.List;
 
 /**
  * A tracker object that tracks the price of an item and determines if the price has changed.
+ * Note that this class's default hashCode and equality implementation uses the item's URL.
+ * Different URLs, however, can still refer to the same product. The user should implement their
+ * own hashCode() and equals() method with a unique product identifier (this may or may not be
+ * provided by the website).
  */
 public abstract class Tracker implements Serializable {
 
-    public static final List<URLType> SUPPORTED_TRACKERS = List.of(URLType.AMAZON);
+    public static final List<URLType> SUPPORTED_TRACKERS = List.of(URLType.AMAZON, URLType.NEWEGG);
     public static final int PRICE_NEVER_CHANGED = -100001;
     public static final int PRICE_NOT_FOUND = -200001;
     public static final String ITEM_NAME_NOT_FOUND = "item name not found";
@@ -25,6 +29,15 @@ public abstract class Tracker implements Serializable {
     double newPrice;
     long lastPriceChange;
 
+    public Tracker(String url) {
+        this.url = url;
+        this.itemName = parseItemName();
+        this.urlType = URLType.getURLType(url);
+        this.users = new ArrayList<>();
+        this.currentPrice = parsePrice();
+        this.newPrice = currentPrice;
+        this.lastPriceChange = PRICE_NEVER_CHANGED;
+    }
 
 
     /**
