@@ -41,7 +41,7 @@ public class TrackerChecker {
         }
     }
 
-    public static TrackerChecker getInstance() {
+    public static synchronized TrackerChecker getInstance() {
         if(INSTANCE == null) {
             INSTANCE = new TrackerChecker();
         }

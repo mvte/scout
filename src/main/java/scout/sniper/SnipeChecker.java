@@ -26,7 +26,7 @@ public class SnipeChecker {
         run();
     }
 
-    public static SnipeChecker getInstance() {
+    public static synchronized SnipeChecker getInstance() {
         if(INSTANCE == null) {
             INSTANCE = new SnipeChecker();
         }
