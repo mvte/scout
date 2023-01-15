@@ -2,7 +2,7 @@ package scout.model;
 
 public enum URLType {
 
-    BEST_BUY ("https://www.bestbuy.com"),
+    BESTBUY ("https://www.bestbuy.com"),
     AMAZON ("https://www.amazon.com"),
     GAMESTOP ("https://www.gamestop.com"),
     NEWEGG("https://www.newegg.com"),

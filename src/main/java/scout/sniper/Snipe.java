@@ -10,7 +10,7 @@ import java.util.List;
 public abstract class Snipe implements Serializable {
     //TODO: check out why addUser() is not being used?
 
-    public static final List<URLType> SUPPORTED_SNIPES = List.of(URLType.BEST_BUY, URLType.RUTGERS, URLType.GAMESTOP);
+    public static final List<URLType> SUPPORTED_SNIPES = List.of(URLType.BESTBUY, URLType.RUTGERS, URLType.GAMESTOP);
     public static final String ITEM_NAME_NOT_FOUND = "item name not found";
 
     String url;

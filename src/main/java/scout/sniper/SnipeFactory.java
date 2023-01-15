@@ -13,7 +13,7 @@ public class SnipeFactory {
 
         Snipe snipe;
         switch(url) {
-            case BEST_BUY:
+            case BESTBUY:
                 snipe = new BestBuySnipe(urlString);
                 break;
             case GAMESTOP:
