@@ -33,8 +33,9 @@ public class SnipeFactory {
 
     public Snipe createSnipe(String urlString, boolean addToChecker) {
         Snipe snipe = createSnipe(urlString);
-        if(snipe == null)
+        if(snipe == null) {
             return null;
+        }
         if(!addToChecker) {
             return snipe;
         }

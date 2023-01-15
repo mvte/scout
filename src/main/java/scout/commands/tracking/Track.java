@@ -33,7 +33,7 @@ public class Track extends Command {
         URLType urlType = URLType.getURLType(args.get(0));
         if(urlType != null && !Tracker.SUPPORTED_TRACKERS.contains(urlType)) {
             channel.sendMessage("scout doesn't support tracking for this url. currently, we only support " +
-                    "amazon items.").queue();
+                    "amazon and newegg items.").queue();
             return;
         }
 
