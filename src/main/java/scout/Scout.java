@@ -15,6 +15,7 @@ import java.util.concurrent.ScheduledExecutorService;
 public class Scout {
     public static JDA bot;
     public static ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+    public static Thread snipe_thread = new Thread(SnipeChecker.getInstance()::run);
 
     private Scout() {
         bot = JDABuilder.createDefault(Config.get("token"))
@@ -23,6 +24,7 @@ public class Scout {
                 .addEventListeners(new Listener())
                 .build();
         load();
+        snipe_thread.start();
     }
 
     private void load() {

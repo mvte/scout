@@ -10,7 +10,11 @@ import scout.model.UserModel;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.concurrent.*;
+
+import static java.lang.Thread.*;
+import static scout.Scout.snipe_thread;
 
 /**
  * Singleton class that will check all snipes for stock.
@@ -18,12 +22,14 @@ import java.util.concurrent.*;
 public class SnipeChecker {
     private static final String filename = "snipes.ser";
     private static SnipeChecker INSTANCE;
+
     private HashSet<Snipe> snipes;
+    private HashSet<CompletableFuture<Boolean>> stock;
 
     private SnipeChecker() {
         this.snipes = new HashSet<>();
+        this.stock = new HashSet<>();
         loadSnipes();
-        run();
     }
 
     public static synchronized SnipeChecker getInstance() {
@@ -33,8 +39,30 @@ public class SnipeChecker {
         return INSTANCE;
     }
 
-    private void run() {
-        Scout.service.scheduleAtFixedRate(this::checkSnipes, 0, 800, TimeUnit.MILLISECONDS);
+    public void run() {
+        CompletableFuture<Void> allFutures;
+
+        for(;;) {
+            stock.clear();
+            checkSnipes();
+            allFutures = CompletableFuture.allOf(stock.toArray(new CompletableFuture[0]));
+            try {
+                allFutures.get(6, TimeUnit.SECONDS);
+            } catch (TimeoutException e) {
+                e.printStackTrace();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+                break;
+            }
+
+            try {
+                sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                break;
+            }
+
+        }
     }
 
     public Snipe getSnipe(Snipe snipe) {
@@ -55,12 +83,21 @@ public class SnipeChecker {
     }
 
     private void checkSnipes() {
-        for(Snipe s : snipes) {
-            Scout.service.submit(() -> {
-                if(s.inStock()) notifyAllUsers(s);
-            });
-        }
+//        for(Snipe s : snipes) {
+//            Scout.service.submit(() -> {
+//                if(s.inStock()) notifyAllUsers(s);
+//            });
+//        }
 
+        for (Snipe snipe : snipes) {
+            stock.add(CompletableFuture.supplyAsync(snipe::inStock).thenApply(inStock -> {
+                System.out.println("checking: " + snipe.getItemName());
+                if (inStock) {
+                    notifyAllUsers(snipe);
+                }
+                return inStock;
+            }));
+        }
     }
 
     private void notifyAllUsers(Snipe snipe) {
