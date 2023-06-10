@@ -1,27 +1,26 @@
 package scout.sniper;
 
 import scout.model.URLType;
-import scout.model.UserModel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Snipe implements Serializable {
+public abstract class Snipe {
     //TODO: check out why addUser() is not being used?
 
-    public static final List<URLType> SUPPORTED_SNIPES = List.of(URLType.BESTBUY, URLType.RUTGERS, URLType.GAMESTOP);
+    public static final List<URLType> SUPPORTED_SNIPES = List.of(URLType.RUTGERS);
     public static final String ITEM_NAME_NOT_FOUND = "item name not found";
 
     String url;
     String itemName;
-    ArrayList<UserModel> users;
+    ArrayList<Long> users;
     URLType urlType;
 
     public abstract boolean inStock();
 
-    public void addUser(UserModel user) {
-        users.add(user);
+    public void addUser(long userID) {
+        users.add(userID);
     }
 
     public String getUrl() {
@@ -32,7 +31,7 @@ public abstract class Snipe implements Serializable {
         return itemName;
     }
 
-    public ArrayList<UserModel> getUsers() {
+    public ArrayList<Long> getUsers() {
         return users;
     }
 
