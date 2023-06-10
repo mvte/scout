@@ -53,7 +53,7 @@ public class RutgersCourseDatabase {
 
     public RutgersSection getSection(String index) {
         try {
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scout", "root", "micaela");
+            Connection con = DriverManager.getConnection(System.getenv("DB_URL"), System.getenv("DB_USER"), System.getenv("DB_PASS"));
             PreparedStatement ps = con.prepareStatement("SELECT * FROM rudb WHERE id = ?");
             ps.setString(1, index);
             ResultSet rs = ps.executeQuery();
