@@ -32,12 +32,12 @@ public class Reload extends Command {
         channel.sendMessage("reloading...").queue();
         RutgersCourseDatabase rutgersCourseDatabase = RutgersCourseDatabase.getInstance();
 
-        double time = rutgersCourseDatabase.loadFromEndpoint();
-        if(time == RutgersCourseDatabase.LOAD_FAILED) {
-            channel.sendMessage("failed to load courses").queue();
-        } else {
-            channel.sendMessage("loaded courses in " + time + " seconds").queue();
-        }
+//        double time = rutgersCourseDatabase.load();
+//        if(time == RutgersCourseDatabase.LOAD_FAILED) {
+//            channel.sendMessage("failed to load courses").queue();
+//        } else {
+//            channel.sendMessage("loaded courses in " + time + " seconds").queue();
+//        }
     }
 
     @Override
