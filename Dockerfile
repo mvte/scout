@@ -1,14 +1,14 @@
 # build stage
 FROM gradle:latest AS BUILD
 WORKDIR /app
-COPY src .
+COPY . .
 RUN gradle clean build
 
 # production stage
 FROM openjdk:latest
-ENV ARTIFACT_NAME=scout.jar
+ENV ARTIFACT_NAME='scout-1.0.jar'
 
 WORKDIR /app
-COPY --from=BUILD src .
+COPY --from=BUILD . .
 
-ENTRYPOINT exec java -jar ./app/lib/build/libs/$ARTIFACT_NAME
+ENTRYPOINT exec java -jar ./app/build/libs/$ARTIFACT_NAME
