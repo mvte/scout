@@ -4,24 +4,44 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
+import java.sql.*;
 import java.util.Scanner;
 import java.util.zip.GZIPInputStream;
 
 public class RutgersCourseDatabase {
 
-    private static final String coursesEndPoint = "https://sis.rutgers.edu/soc/api/courses.json?year=2023&term=1&campus=NB";
-    public static final double LOAD_FAILED = -1;
+    private static final String coursesEndPoint = "https://sis.rutgers.edu/soc/api/courses.json?year=2023&term=9&campus=NB";
+    private static final String openSectionsEndPoint = "https://sis.rutgers.edu/soc/api/openSections.json?year=2023&term=9&campus=NB";
     private static RutgersCourseDatabase INSTANCE;
-    private static String filename = "rutgers_sections.ser";
-
-    private HashMap<String, RutgersSection> sectionsMap;
+    private static final boolean DEBUG = true;
+    private JSONArray openSectionsList;
 
     private RutgersCourseDatabase() {
-        sectionsMap = new HashMap<>();
+        System.out.println("-= building rutgers course database =-");
+
+        try {
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scout", "root", "micaela");
+            System.out.println("successfully connected to database ");
+
+            System.out.println("creating table if not exists");
+            Statement makeTable = con.createStatement();
+
+            String s = "CREATE TABLE IF NOT EXISTS rudb (id VARCHAR(10), section VARCHAR(10), title VARCHAR(255), PRIMARY KEY (id))";
+            makeTable.executeUpdate(s);
+
+            double time = load(con);
+            System.out.println("loaded courses from endpoint in " + time + " seconds");
+
+            System.out.println("-= successfully built rutgers course database =-");
+        } catch(SQLException e) {
+            e.printStackTrace();
+            System.out.println("-= could not connect to database, please restart scout =-");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("-= could not build database, please restart scout =-");
+        }
     }
 
     public static RutgersCourseDatabase getInstance() {
@@ -32,43 +52,52 @@ public class RutgersCourseDatabase {
     }
 
     public RutgersSection getSection(String index) {
-        return sectionsMap.get(index);
+        try {
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scout", "root", "micaela");
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM rudb WHERE id = ?");
+            ps.setString(1, index);
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()) {
+                return new RutgersSection(rs.getString("title"), rs.getString("section"), rs.getString("id"));
+            }
+        } catch(SQLException e) {
+            e.printStackTrace();
+            System.out.println("could not find course in database");
+        }
+
+        return null;
     }
 
     public boolean containsSection(String index) {
-        return sectionsMap.containsKey(index);
+        return false;
     }
 
     /**
-     *
+     * Parses courses Rutgers SOC API and loads relevant information into the database.
      * @return the time taken to load from API into database
      */
-    public double loadFromEndpoint() {
+    public double load(Connection con) throws Exception {
         long start = System.currentTimeMillis();
 
         JSONArray raw = retrieve();
         if(raw == null) {
-            System.out.println("could not retrieve courses from endpoint");
-            return LOAD_FAILED;
+            throw new Exception("could not retrieve courses from endpoint");
         }
         System.out.println("successfully retrieved courses");
 
-        if(!build(raw)) {
-            System.out.println("could not build database from retrieved JSON");
-            return LOAD_FAILED;
+        if(!build(raw, con)) {
+            throw new Exception("could not build database from retrieved JSON");
         }
 
-        double time = (System.currentTimeMillis() - start)/1000.0;
-        System.out.println("successfully built database in " + time + " seconds");
-
-        return time;
+        return (System.currentTimeMillis() - start)/1000.0;
     }
 
     /**
      * Makes a connection to the Rutgers SOC API and attempts to parse the data into a JSON Array.
      * @return the parsed JSON array from the API call
      */
-    public JSONArray retrieve() {
+    private JSONArray retrieve() {
         try{
             URL request = new URL(coursesEndPoint);
             HttpURLConnection con = (HttpURLConnection) request.openConnection();
@@ -92,9 +121,11 @@ public class RutgersCourseDatabase {
     /**
      * Extracts specific information about all the classes
      * @param arr the retrieved json array from the rutgers database
+     * @param con the connection to the database
      * @return true if the database was successfully built
      */
-    public boolean build(JSONArray arr) {
+    private boolean build(JSONArray arr, Connection con) throws SQLException {
+        PreparedStatement ps = con.prepareStatement("INSERT INTO rudb VALUES(?, ?, ?)");
         for(Object obj : arr) {
             JSONObject course = (JSONObject)obj;
 
@@ -104,50 +135,55 @@ public class RutgersCourseDatabase {
                 JSONObject section = (JSONObject)obj2;
 
                 String sectionNo = (String)section.get("number");
-                String index = (String)section.get("index");
-                RutgersSection rs = new RutgersSection(title, sectionNo, index);
+                String id = (String)section.get("index");
 
-                sectionsMap.put(index, rs);
+                ps.clearParameters();
+                ps.setString(1, id);
+                ps.setString(2, sectionNo);
+                ps.setString(3, title);
+
+                try {
+                    ps.executeUpdate();
+                } catch (SQLIntegrityConstraintViolationException e) {
+                    continue;
+                }
             }
         }
 
         return true;
     }
 
-    public void saveToFile() {
-        try(
-            FileOutputStream fout = new FileOutputStream(filename);
-            ObjectOutput oos = new ObjectOutputStream(fout))
-        {
-            oos.writeObject(sectionsMap);
+    public void parseOpenSections() {
+        try {
+            URL request = new URL(openSectionsEndPoint);
+            HttpURLConnection con = (HttpURLConnection) request.openConnection();
+
+            Scanner read = new Scanner(new GZIPInputStream(con.getInputStream()));
+            String inline = "";
+            while (read.hasNext()) {
+                inline += read.nextLine();
+            }
+            read.close();
+
+            JSONParser parse = new JSONParser();
+            openSectionsList = (JSONArray) parse.parse(inline);
         } catch(Exception e) {
             e.printStackTrace();
+            System.out.println("could not parse open sections");
         }
     }
 
-    public void loadFromFile() {
-        try(
-            FileInputStream fin = new FileInputStream(filename);
-            ObjectInputStream in = new ObjectInputStream(fin))
-        {
-            sectionsMap = (HashMap<String, RutgersSection>)in.readObject();
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+    public boolean isOpen(String index) {
+        return openSectionsList.contains(index);
     }
-
 
 
     /** unit testing **/
     public static void main(String[] args) {
-        RutgersCourseDatabase rcdb = new RutgersCourseDatabase();
-        rcdb.loadFromEndpoint();
-        System.out.println(rcdb.getSection("15189").getTitle());
-        rcdb.saveToFile();
+        RutgersCourseDatabase rudb = RutgersCourseDatabase.getInstance();
 
-        RutgersCourseDatabase rcdb2 = new RutgersCourseDatabase();
-        rcdb2.loadFromFile();
-        System.out.println(rcdb2.getSection("15189").getTitle());
+        RutgersSection section = rudb.getSection("07382");
+        System.out.println(section.getSection() + " " + section.getTitle() + " " + section.getIndex());
     }
 
 }
