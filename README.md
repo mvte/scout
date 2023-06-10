@@ -32,5 +32,8 @@ scout parses information about a product in two ways:
 checks for availability or a price change for each sniper/tracker are all done asynchronously to keep things fast. when a change in availability 
 or stock is detected a notification will be sent to a user's private dms.
 
+### deployment
+this bot is deployed on my home server with docker, composed with a mysql database.
+
 ## questions/issues
 scout is always being improved upon. if you have any questions or comments, message me on discord `@mvte#9597`
