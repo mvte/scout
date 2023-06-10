@@ -158,4 +158,55 @@ public class SnipeChecker {
         }
         return userSnipes;
     }
+
+    public void removeSnipe(Snipe snipe) throws SQLException{
+        //first delete from database
+        Connection conn = DriverManager.getConnection(
+            System.getenv("DB_URL"), System.getenv("DB_USER"), System.getenv("DB_PASS")
+        );
+        conn.createStatement().executeUpdate(
+        "DELETE FROM snipes WHERE product_id = '" + snipe.getUrl() + "'"
+        );
+
+        //then remove from snipes
+        snipes.remove(snipe);
+    }
+
+    /**
+     * Load snipes from database and instantiate them.
+     */
+    public void loadSnipes() {
+        System.out.println("-= building snipes hash set =-");
+        SnipeFactory factory = new SnipeFactory();
+        int c = 0;
+        try {
+            Connection conn = DriverManager.getConnection(
+                System.getenv("DB_URL"), System.getenv("DB_USER"), System.getenv("DB_PASS")
+            );
+            var rs = conn.createStatement().executeQuery("SELECT * FROM snipes");
+            System.out.println("pulled snipes from database");
+            while(rs.next()) {
+                long userID = rs.getLong("user_id");
+                String productID = rs.getString("product_id");
+                URLType type = URLType.valueOf(rs.getString("type"));
+
+                Snipe snipe = factory.createSnipe(productID, true);
+                snipe.addUser(userID);
+            }
+            System.out.println("pulled " + c + " snipes from database, and created " + snipes.size() + " instances");
+
+            conn.close();
+        } catch(SQLException e) {
+            System.out.println("something went wrong loading snipes from database");
+            e.printStackTrace();
+        } catch(NullPointerException e) {
+            e.printStackTrace();
+            System.out.println("a snipe was found to be null");
+        }
+
+        System.out.println("-= snipes hash set built =-");
+        for(Snipe s : snipes) {
+            System.out.println(s.getItemName());
+        }
+    }
 }
