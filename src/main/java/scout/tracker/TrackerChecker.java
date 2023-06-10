@@ -18,7 +18,6 @@ public class TrackerChecker {
 
     private TrackerChecker() {
         this.trackers = new HashSet<>();
-        loadTrackers();
         run();
     }
 
@@ -58,35 +57,6 @@ public class TrackerChecker {
         }
 
         return null;
-    }
-
-    public void loadTrackers() {
-        if(!new File(filename).exists()) {
-            return;
-        }
-        try (
-            FileInputStream fin = new FileInputStream(filename);
-            ObjectInputStream in = new ObjectInputStream(fin))
-        {
-            trackers = (HashSet<Tracker>)in.readObject();
-        } catch (Exception e) {
-            System.out.println("could not load trackers, using new empty tracker list");
-        }
-    }
-
-    public void saveTrackers() {
-        if(trackers.isEmpty()) {
-            return;
-        }
-
-        try(
-            FileOutputStream fout = new FileOutputStream(filename);
-            ObjectOutput oos = new ObjectOutputStream(fout))
-        {
-            oos.writeObject(trackers);
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public void clearEmptyTrackers() {
