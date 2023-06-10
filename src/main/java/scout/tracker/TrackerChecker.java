@@ -1,7 +1,6 @@
 package scout.tracker;
 
 import scout.Scout;
-import scout.model.UserModel;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -71,7 +70,7 @@ public class TrackerChecker {
         {
             trackers = (HashSet<Tracker>)in.readObject();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("could not load trackers, using new empty tracker list");
         }
     }
 
@@ -94,10 +93,10 @@ public class TrackerChecker {
         trackers.removeIf(t -> t.getUsers().isEmpty());
     }
 
-    public ArrayList<Tracker> getUserTrackers(UserModel userModel) {
+    public ArrayList<Tracker> getUserTrackers(long userID) {
         ArrayList<Tracker> userTrackers = new ArrayList<>();
         for(Tracker t : trackers) {
-            if(t.getUsers().contains(userModel))
+            if(t.getUsers().contains(userID))
                 userTrackers.add(t);
         }
         return userTrackers;

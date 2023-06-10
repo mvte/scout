@@ -6,8 +6,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import scout.commands.Command;
 import scout.commands.CommandCategory;
 import scout.model.URLType;
-import scout.model.UserModel;
-import scout.model.UserModelDatabase;
 import scout.tracker.TrackerChecker;
 import scout.tracker.TrackerFactory;
 
@@ -31,7 +29,7 @@ public class RemoveTracker extends Command {
             return;
         }
 
-        UserModel user = UserModelDatabase.getInstance().getUser(event.getAuthor().getIdLong());
+        long user = event.getAuthor().getIdLong();
         scout.tracker.Tracker tracker = TrackerFactory.createTracker(args.get(0));
 
         scout.tracker.Tracker realTracker;

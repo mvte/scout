@@ -5,8 +5,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import scout.commands.Command;
 import scout.commands.CommandCategory;
-import scout.model.UserModel;
-import scout.model.UserModelDatabase;
 import scout.tracker.Tracker;
 import scout.tracker.TrackerFactory;
 
@@ -38,7 +36,7 @@ public class ForceNotify extends Command {
             return;
         }
 
-        UserModel user = UserModelDatabase.getInstance().getUser(userId);
+        long user = event.getAuthor().getIdLong();
         tracker.addUser(user);
 
         tracker.debugPriceChange();

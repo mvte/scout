@@ -7,8 +7,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import scout.Scout;
 import scout.commands.Command;
 import scout.commands.CommandCategory;
-import scout.model.UserModel;
-import scout.model.UserModelDatabase;
 import scout.tracker.Tracker;
 import scout.tracker.TrackerChecker;
 
@@ -22,8 +20,7 @@ public class CheckTrackers extends Command {
     @Override
     public void handle(MessageReceivedEvent event, List<String> args) {
         MessageChannel channel = event.getChannel();
-        UserModel user = UserModelDatabase.getInstance().getUser(event.getAuthor().getIdLong());
-        User jdaUser = Scout.bot.getUserById(user.getId());
+        User jdaUser = event.getAuthor();
 
         EmbedBuilder eb = new EmbedBuilder()
                 .setTitle("your trackers")
@@ -31,9 +28,9 @@ public class CheckTrackers extends Command {
                 .setFooter(jdaUser.getName())
                 .setTimestamp(java.time.Instant.now());
 
-        for(Tracker t : TrackerChecker.getInstance().getUserTrackers(user)) {
-            String priceFound = t.getCurrentPrice() == -2 ? "PRICE_NOT_FOUND" : String.format("$%.2f", t.getCurrentPrice());
-            String statusMessage = String.format("[%s](%s)%n last price change: %s", priceFound, t.getUrl(), t.getLastPriceChange());
+        for(Tracker t : TrackerChecker.getInstance().getUserTrackers(jdaUser.getIdLong())) {
+            String statusMessage = String.format("[%s](%s)%n last price change: %s",
+                    t.getCurrentPriceString(), t.getUrl(), t.getLastPriceChange());
             eb.addField(t.getItemName(), statusMessage, false);
         }
 
@@ -55,7 +52,7 @@ public class CheckTrackers extends Command {
 
     @Override
     public String getHelp() {
-        return "gives list of trackers. note: if the price says PRICE_NOT_FOUND, it means scout was unable to find the price of the item. " +
+        return "gives list of trackers. note: if the price says `unknown`, it means scout was unable to find the price of the item. " +
                 "this is usually because the item is either out of stock or the price is not displayed on the page. don't worry, scout will " +
                 "notify you when the price is found";
     }

@@ -4,8 +4,6 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import scout.model.UserModel;
-import scout.model.UserModelDatabase;
 
 public class Listener extends ListenerAdapter {
 
@@ -20,15 +18,14 @@ public class Listener extends ListenerAdapter {
         String prefix = Config.get("prefix");
 
         //hardcode shutdown
-        if(event.getMessage().getContentRaw().equalsIgnoreCase(prefix + "shutdown") && event.getAuthor().getId().equals(Config.get("owner_id"))) {
+        if(event.getMessage().getContentRaw().equalsIgnoreCase(prefix + "shutdown")
+                && event.getAuthor().getId().equals(Config.get("owner_id"))) {
             event.getChannel().sendMessage("shutting down").complete();
             System.out.println("shutting down");
             Scout.save();
             event.getJDA().shutdown();
             System.exit(0);
         }
-
-        UserModelDatabase.getInstance().addUserIfNotExist(new UserModel(event.getAuthor().getIdLong()));
 
         if(event.getMessage().getContentRaw().startsWith(prefix)) {
             manager.handle(event, prefix);
@@ -38,7 +35,6 @@ public class Listener extends ListenerAdapter {
     @Override
     public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
         event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRoleById(MEMBER_ROLE)).queue();
-        UserModelDatabase.getInstance().addUserIfNotExist(new UserModel(event.getMember().getIdLong()));
     }
 
 }

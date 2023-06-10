@@ -3,8 +3,6 @@ package scout.commands.sniping;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import scout.commands.Command;
 import scout.commands.CommandCategory;
-import scout.model.UserModel;
-import scout.model.UserModelDatabase;
 import scout.sniper.SnipeChecker;
 import scout.sniper.SnipeFactory;
 import scout.model.URLType;
@@ -31,7 +29,7 @@ public class RemoveSnipe extends Command {
             return;
         }
 
-        UserModel user = UserModelDatabase.getInstance().getUser(event.getAuthor().getIdLong());
+        long userID = event.getAuthor().getIdLong();
         SnipeFactory sf = new SnipeFactory();
         scout.sniper.Snipe s = sf.createSnipe(args.get(0));
 
@@ -40,14 +38,14 @@ public class RemoveSnipe extends Command {
             channel.sendMessage("this snipe does not exist").queue();
             return;
         }
-        if(!realSnipe.getUsers().contains(user)) {
+        if(!realSnipe.getUsers().contains(userID)) {
             System.out.println(s);
             System.out.println(realSnipe);
             channel.sendMessage("you are not sniping this item").queue();
             return;
         }
 
-        realSnipe.getUsers().remove(user);
+        realSnipe.getUsers().remove(userID);
         SnipeChecker.getInstance().clearEmptySnipes();
 
         EmbedBuilder eb = new EmbedBuilder()
@@ -65,7 +63,7 @@ public class RemoveSnipe extends Command {
 
     @Override
     public String getHelp() {
-        return "removes a snipe given the link that was provided to create it";
+        return "removes a snipe given the id that was provided to create it";
     }
 
     @Override

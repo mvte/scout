@@ -1,7 +1,11 @@
 package scout.tracker;
 
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import scout.Scout;
 import scout.model.URLType;
-import scout.model.UserModel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -24,7 +28,7 @@ public abstract class Tracker implements Serializable {
     String url;
     String itemName;
     URLType urlType;
-    ArrayList<UserModel> users;
+    ArrayList<Long> users;
     double currentPrice;
     double newPrice;
     long lastPriceChange;
@@ -91,6 +95,9 @@ public abstract class Tracker implements Serializable {
     }
 
     public double getPriceChange() {
+        if(newPrice == PRICE_NOT_FOUND || currentPrice == PRICE_NOT_FOUND) {
+            return 0;
+        }
         return newPrice - currentPrice;
     }
 
@@ -132,7 +139,7 @@ public abstract class Tracker implements Serializable {
         return urlType;
     }
 
-    public ArrayList<UserModel> getUsers() {
+    public ArrayList<Long> getUsers() {
         return users;
     }
 
@@ -156,9 +163,37 @@ public abstract class Tracker implements Serializable {
 
     public void notifyAllUsers() {
         System.out.println("notifying users");
-        for(UserModel user : users) {
-            user.notifyUser(this);
+        String priceCompare = String.format("**%s** -> **%s**", getCurrentPriceString(), getNewPriceString());
+
+        double delta = getPriceChange();
+        int percentageDiff = getPercentageDifference();
+        String sign = percentageDiff < 0 ? "-" : "+";
+        String priceChangeAmount =
+                String.format("%s$%.2f (%d%%)", sign, Math.abs(delta), percentageDiff);
+
+        EmbedBuilder eb = new EmbedBuilder()
+                .setTitle("the price of one your tracked items has updated!")
+                .setDescription(getItemName())
+                .setThumbnail(Scout.bot.getSelfUser().getAvatarUrl())
+                .addField(priceCompare, priceChangeAmount, false)
+                .setTimestamp(java.time.Instant.now());
+        ActionRow ar = ActionRow.of(Button.link(getUrl(), "go to"));
+
+        for(long user : users) {
+            notifyUser(user, eb, ar);
+            System.out.println("notified user " + user + " of price change for " + getItemName());
         }
+    }
+
+    private void notifyUser(long userID, EmbedBuilder eb, ActionRow ar) {
+        User jdaUser = Scout.bot.getUserById(userID);
+        if(jdaUser == null) {
+            System.out.println("user " + userID + " not found in JDA");
+            return;
+        }
+        jdaUser.openPrivateChannel()
+                .flatMap(channel -> channel.sendMessageEmbeds(eb.build()).setComponents(ar))
+                .queue();
     }
 
     public void update() {
@@ -166,7 +201,7 @@ public abstract class Tracker implements Serializable {
         currentPrice = newPrice;
     }
 
-    public void addUser(UserModel user) {
+    public void addUser(long user) {
         users.add(user);
     }
 
@@ -188,7 +223,7 @@ public abstract class Tracker implements Serializable {
         return newPrice;
     }
 
-    public void removeUser(UserModel user) {
+    public void removeUser(long user) {
         users.remove(user);
     }
 

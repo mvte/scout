@@ -7,8 +7,6 @@ import scout.Scout;
 import scout.commands.Command;
 import scout.commands.CommandCategory;
 import scout.model.URLType;
-import scout.model.UserModel;
-import scout.model.UserModelDatabase;
 import scout.tracker.Tracker;
 import scout.tracker.TrackerChecker;
 import scout.tracker.TrackerFactory;
@@ -45,7 +43,7 @@ public class Track extends Command {
             return;
         }
 
-        UserModel user = UserModelDatabase.getInstance().getUser(userId);
+        long user = event.getAuthor().getIdLong();
         if(TrackerChecker.getInstance().getUserTrackers(user).contains(tracker)) {
             channel.sendMessage("you are already tracking this item!").queue();
             return;
