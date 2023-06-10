@@ -169,6 +169,7 @@ public class SnipeChecker {
             System.out.println("pulled " + c + " snipes from database, and created " + snipes.size() + " instances");
 
             conn.close();
+            System.out.println("-= snipes hash set built =-");
         } catch(SQLException e) {
             System.out.println("something went wrong loading snipes from database");
             e.printStackTrace();
@@ -177,9 +178,5 @@ public class SnipeChecker {
             System.out.println("a snipe was found to be null");
         }
 
-        System.out.println("-= snipes hash set built =-");
-        for(Snipe s : snipes) {
-            System.out.println(s.getItemName());
-        }
     }
 }
