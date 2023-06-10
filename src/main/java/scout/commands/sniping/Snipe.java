@@ -1,14 +1,14 @@
 package scout.commands.sniping;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import scout.Scout;
 import scout.commands.Command;
 import scout.commands.CommandCategory;
-import scout.model.UserModel;
-import scout.model.UserModelDatabase;
-import scout.sniper.SnipeChecker;
 import scout.sniper.SnipeFactory;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -36,12 +36,27 @@ public class Snipe extends Command {
 			return;
 		}
 
-		UserModel user = UserModelDatabase.getInstance().getUser(userId);
-		if(snipe.getUsers().contains(user)) {
+		long userID = event.getAuthor().getIdLong();
+		if(snipe.getUsers().contains(userID)) {
 			channel.sendMessage("you are already sniping this item!").queue();
 			return;
 		}
-		snipe.getUsers().add(user);
+
+		try {
+			Connection conn = DriverManager.getConnection(
+					System.getenv("DB_URL"), System.getenv("DB_USER"), System.getenv("DB_PASS"));
+			String insert = "INSERT INTO snipes VALUES (?, ?, ?)";
+			PreparedStatement stmt = conn.prepareStatement(insert);
+			stmt.setLong(1, userID);
+			stmt.setString(2, args.get(0));
+			stmt.setString(3, snipe.getUrlType().toString());
+			stmt.executeUpdate();
+		} catch(Exception e) {
+			e.printStackTrace();
+			channel.sendMessage("something went wrong adding your snipe! (").queue();
+		}
+
+		snipe.getUsers().add(userID);
 
 		EmbedBuilder eb = new EmbedBuilder()
 				.setTitle("successfully added snipe request")
@@ -60,7 +75,7 @@ public class Snipe extends Command {
 	@Override
 	public String getHelp() {
 		return "the bot will send you a message when an item you want is in stock. currently, this bot only supports " +
-				"sniping best buy and gamestop links, and rutgers course codes \nusage: `.snipe <link/code>`";
+				"sniping rutgers courses \nusage: `.snipe <link/code>`";
 	}
 	
 }
