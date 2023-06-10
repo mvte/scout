@@ -3,27 +3,30 @@ package scout.sniper;
 import scout.model.RutgersCourseDatabase;
 import scout.model.URLType;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
 public class SnipeFactory {
 
 
     public Snipe createSnipe(String urlString) {
         URLType url = URLType.getURLType(urlString);
-        if(url == null)
+        if(url == null || !validateProduct(urlString))
             return null;
 
         Snipe snipe;
         switch(url) {
-            case BESTBUY:
-                snipe = new BestBuySnipe(urlString);
-                break;
-            case GAMESTOP:
-                snipe = new GameStopSnipe(urlString);
-                break;
+//            case BESTBUY:
+//                snipe = new BestBuySnipe(urlString);
+//                break;
+//            case GAMESTOP:
+//                snipe = new GameStopSnipe(urlString);
+//                break;
             case RUTGERS:
-                if(RutgersCourseDatabase.getInstance().containsSection(urlString)) {
-                    snipe = new RutgersSnipe(urlString);
-                    break;
-                }
+                snipe = new RutgersSnipe(urlString);
+                break;
             default:
                 return null;
         }
@@ -44,5 +47,34 @@ public class SnipeFactory {
             return snipe;
         else
             return SnipeChecker.getInstance().getSnipe(snipe);
+    }
+
+    /**
+     * Ensures that a product is valid before creating.
+     * @param productId the product id to validate
+     * @return true if the product is valid, false otherwise
+     */
+    private boolean validateProduct(String productId) {
+        if(productId.length() == 5) {
+            return validateRutgers(productId);
+        }
+
+        return false;
+    }
+
+    private boolean validateRutgers(String productId) {
+        try {
+            Connection con = DriverManager.getConnection(
+                System.getenv("DB_URL"), System.getenv("DB_USER"), System.getenv("DB_PASS"));
+            String query = "SELECT * FROM rudb WHERE id = ?";
+            PreparedStatement stmt = con.prepareStatement(query);
+            stmt.setString(1, productId);
+            ResultSet rs = stmt.executeQuery();
+
+            return rs.next();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
