@@ -58,7 +58,7 @@ public class Initialize extends Command {
                 "i support tracking for the following websites: " + getTrackerWebsites();
         String howInfo = "depending on the product, i either scrape information directly from the url you provide or i'll access the website's api. " +
                 "then, i'll periodically check the product's price/availability. snipes are checked every second, and trackers are checked every 5 minutes. ";
-        String sourceCodeInfo = "if you _really_ wanna know how i work, i'm open source! you can check out my code (here)[https://github.com/mvte/scout]";
+        String sourceCodeInfo = "if you _really_ wanna know how i work, i'm open source! you can check out my code [here](https://github.com/mvte/scout)";
         String supportInfo = "i'm still in development, so i might not be perfect. if you have any questions, feel free to ask in general. " +
                 "if you find any bugs, please report them to any of our admins. if you have any suggestions, feel free to suggest them in general.";
 

@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.Nullable;
 import scout.commands.*;
 import scout.commands.admin.ForceNotify;
+import scout.commands.admin.Initialize;
 import scout.commands.admin.Reload;
 import scout.commands.sniping.CheckSnipes;
 import scout.commands.sniping.RemoveSnipe;
@@ -35,6 +36,7 @@ public class CommandManager {
         addCommand(new RemoveTracker(TRACKER));
         addCommand(new ForceNotify(ADMIN));
         addCommand(new Reload(ADMIN));
+        addCommand(new Initialize(ADMIN));
     }
 
     /**
