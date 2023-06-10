@@ -5,9 +5,13 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import scout.Scout;
-import scout.model.UserModel;
+import scout.model.RutgersCourseDatabase;
+import scout.model.URLType;
 
 import java.io.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,21 +24,21 @@ import static scout.Scout.snipe_thread;
  * Singleton class that will check all snipes for stock.
  */
 public class SnipeChecker {
-    private static final String filename = "snipes.ser";
     private static SnipeChecker INSTANCE;
-
     private HashSet<Snipe> snipes;
     private HashSet<CompletableFuture<Boolean>> stock;
+    private static int numInstances = 0;
 
     private SnipeChecker() {
         this.snipes = new HashSet<>();
         this.stock = new HashSet<>();
-        loadSnipes();
+        numInstances++;
     }
 
     public static synchronized SnipeChecker getInstance() {
         if(INSTANCE == null) {
             INSTANCE = new SnipeChecker();
+            System.out.println("num instances: " + numInstances);
         }
         return INSTANCE;
     }
@@ -43,25 +47,19 @@ public class SnipeChecker {
         CompletableFuture<Void> allFutures;
 
         for(;;) {
+            RutgersCourseDatabase.getInstance().parseOpenSections();
             stock.clear();
             checkSnipes();
             allFutures = CompletableFuture.allOf(stock.toArray(new CompletableFuture[0]));
             try {
                 allFutures.get(6, TimeUnit.SECONDS);
-            } catch (TimeoutException e) {
-                e.printStackTrace();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-                break;
-            }
-
-            try {
-                sleep(1000);
+                sleep(800);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 break;
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
         }
     }
 
@@ -83,15 +81,8 @@ public class SnipeChecker {
     }
 
     private void checkSnipes() {
-//        for(Snipe s : snipes) {
-//            Scout.service.submit(() -> {
-//                if(s.inStock()) notifyAllUsers(s);
-//            });
-//        }
-
         for (Snipe snipe : snipes) {
             stock.add(CompletableFuture.supplyAsync(snipe::inStock).thenApply(inStock -> {
-                System.out.println("checking: " + snipe.getItemName());
                 if (inStock) {
                     notifyAllUsers(snipe);
                 }
@@ -101,7 +92,14 @@ public class SnipeChecker {
     }
 
     private void notifyAllUsers(Snipe snipe) {
-        snipes.remove(snipe);
+        try {
+            removeSnipe(snipe);
+        } catch(SQLException e) {
+            System.out.println("something went wrong removing snipe: " + snipe.getItemName()
+                + ". does it exist?");
+            return;
+        }
+
         String stockMessage = snipe instanceof RutgersSnipe ? " **is open!**\n" : " **is in stock!**\n";
         EmbedBuilder eb = new EmbedBuilder()
                 .setTitle(snipe.getItemName() + stockMessage)
@@ -110,46 +108,24 @@ public class SnipeChecker {
                 .setTimestamp(java.time.Instant.now());
         ActionRow ar = ActionRow.of(Button.link(snipe.getUrl(), "go to"));
 
-        for(UserModel user : snipe.getUsers()) {
-            User jdaUser = Scout.bot.getUserById(user.getId());
-
-            jdaUser.openPrivateChannel()
-                    .flatMap(channel -> channel.sendMessageEmbeds(eb.setFooter(jdaUser.getName()).build())
-                            .setComponents(ar))
-                    .queue();
+        for(long user : snipe.getUsers()) {
+            notifyUser(user, eb, ar);
+            System.out.println("notified user " + user + ": " + snipe.getItemName());
         }
     }
 
-    private void loadSnipes() {
-        if(!new File(filename).exists()) {
+    private void notifyUser(long userID, EmbedBuilder eb, ActionRow ar) {
+        User jdaUser = Scout.bot.getUserById(userID);
+        if(jdaUser == null) {
+            System.out.println("user " + userID + " not found in JDA");
             return;
         }
-        try (
-                FileInputStream fin = new FileInputStream(filename);
-                ObjectInputStream in = new ObjectInputStream(fin))
-        {
-            snipes = (HashSet<Snipe>)in.readObject();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        jdaUser.openPrivateChannel()
+            .flatMap(channel -> channel.sendMessageEmbeds(eb.build()).setComponents(ar))
+            .queue();
     }
 
-    public void saveSnipes() {
-        if(snipes.isEmpty()) {
-            return;
-        }
-
-        try(
-                FileOutputStream fout = new FileOutputStream(filename);
-                ObjectOutput oos = new ObjectOutputStream(fout))
-        {
-            oos.writeObject(snipes);
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public ArrayList<Snipe> getUserSnipes(UserModel user) {
+    public ArrayList<Snipe> getUserSnipes(long user) {
         ArrayList<Snipe> userSnipes = new ArrayList<>();
         for(Snipe s : snipes) {
             if(s.getUsers().contains(user)) {
