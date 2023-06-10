@@ -8,17 +8,14 @@ import scout.Scout;
 import scout.model.RutgersCourseDatabase;
 import scout.model.URLType;
 
-import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.concurrent.*;
 
 import static java.lang.Thread.*;
-import static scout.Scout.snipe_thread;
 
 /**
  * Singleton class that will check all snipes for stock.
