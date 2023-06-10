@@ -22,7 +22,7 @@ public class RutgersCourseDatabase {
         System.out.println("-= building rutgers course database =-");
 
         try {
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/scout", "root", "micaela");
+            Connection con = DriverManager.getConnection(System.getenv("DB_URL"), System.getenv("DB_USER"), System.getenv("DB_PASS"));
             System.out.println("successfully connected to database ");
 
             System.out.println("creating table if not exists");
