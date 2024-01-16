@@ -12,11 +12,9 @@ public class RutgersSnipe extends Snipe {
     /** pre-filled register form */
     private static final String register = "https://sims.rutgers.edu/webreg/editSchedule.htm?login=cas&semesterSelection=92023&indexList=%s";
 
-    private final String index;
-
     public RutgersSnipe(String url) {
-        this.index = url;
-        this.url = String.format(register, index);
+        this.id = url;
+        this.url = String.format(register, id);
         this.itemName = parseItemName();
         this.users = new ArrayList<>();
         this.urlType = URLType.RUTGERS;
@@ -28,12 +26,12 @@ public class RutgersSnipe extends Snipe {
      */
     @Override
     public boolean inStock() {
-        return RutgersCourseDatabase.getInstance().isOpen(index);
+        return RutgersCourseDatabase.getInstance().isOpen(id);
     }
 
     @Override
     public String parseItemName() {
-        RutgersSection rs = RutgersCourseDatabase.getInstance().getSection(index);
+        RutgersSection rs = RutgersCourseDatabase.getInstance().getSection(id);
         if(rs == null) {
             return "ITEM_NAME_NOT_FOUND";
         }
@@ -47,12 +45,12 @@ public class RutgersSnipe extends Snipe {
             return false;
         }
 
-        return this.index.equals(((RutgersSnipe)obj).index);
+        return this.id.equals(((RutgersSnipe)obj).id);
     }
 
     @Override
     public int hashCode() {
-        return index.hashCode();
+        return id.hashCode();
     }
 
     public static void main(String[] args) {

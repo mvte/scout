@@ -12,6 +12,7 @@ public abstract class Snipe {
     public static final List<URLType> SUPPORTED_SNIPES = List.of(URLType.RUTGERS);
     public static final String ITEM_NAME_NOT_FOUND = "item name not found";
 
+    String id;
     String url;
     String itemName;
     ArrayList<Long> users;
@@ -21,6 +22,10 @@ public abstract class Snipe {
 
     public void addUser(long userID) {
         users.add(userID);
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getUrl() {
@@ -47,7 +52,7 @@ public abstract class Snipe {
             return false;
         }
 
-        return ((Snipe)obj).getUrl().equals(url);
+        return ((Snipe)obj).getId().equals(id);
     }
 
     @Override
