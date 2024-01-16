@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class RutgersSnipe extends Snipe {
 
     /** pre-filled register form */
-    private static final String register = "https://sims.rutgers.edu/webreg/editSchedule.htm?login=cas&semesterSelection=92023&indexList=%s";
+    private static final String register = "https://sims.rutgers.edu/webreg/editSchedule.htm?login=cas&semesterSelection=12024&indexList=%s";
 
     public RutgersSnipe(String url) {
         this.id = url;
