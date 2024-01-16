@@ -21,6 +21,20 @@ public class Help extends Command {
 
         if(args.isEmpty()) {
             buildAndSendHelp(event.getChannel());
+        } else {
+            for(Command command : manager.getCommands()) {
+                if(command.getName().equalsIgnoreCase(args.get(0)) || command.getAliases().contains(args.get(0))) {
+                    EmbedBuilder eb = new EmbedBuilder()
+                            .setTitle("scout help")
+                            .setFooter("by mute | github.com/mvte")
+                            .setThumbnail(event.getJDA().getSelfUser().getAvatarUrl())
+                            .addField(command.getName(), command.getHelp(), false)
+                            .addField("aliases", command.getAliases().toString(), false);
+                    event.getChannel().sendMessageEmbeds(eb.build()).queue();
+                    return;
+                }
+            }
+            event.getChannel().sendMessage("command not found").queue();
         }
 
     }
@@ -40,7 +54,7 @@ public class Help extends Command {
                     sb.append("`").append(command.getName()).append("`, ");
                 }
             }
-            sb.delete(sb.length() - 2, sb.length());
+            if(sb.length() > 2) sb.delete(sb.length() - 2, sb.length());
             eb.addField(category.toString().toLowerCase(), sb.toString(), false);
         }
 
