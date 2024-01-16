@@ -3,11 +3,12 @@ package scout;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.ChunkingFilter;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import scout.model.RutgersCourseDatabase;
 import scout.sniper.SnipeChecker;
-import scout.tracker.TrackerChecker;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -30,10 +31,21 @@ public class Scout {
     private Scout() throws SQLException {
         bot = JDABuilder.createDefault(Config.get("token"))
                 .setStatus(OnlineStatus.ONLINE)
-                .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+                .setMemberCachePolicy(MemberCachePolicy.ALL)
+                .setChunkingFilter(ChunkingFilter.ALL)
+                .enableIntents(
+                        GatewayIntent.MESSAGE_CONTENT,
+                        GatewayIntent.GUILD_MEMBERS,
+                        GatewayIntent.GUILD_MESSAGES,
+                        GatewayIntent.GUILD_MESSAGE_REACTIONS,
+                        GatewayIntent.DIRECT_MESSAGES,
+                        GatewayIntent.DIRECT_MESSAGE_REACTIONS)
                 .addEventListeners(new Listener())
                 .build();
-
+        Guild homeGuild = bot.getGuildById(System.getenv("HOME_GUILD"));
+        if(homeGuild != null) {
+            homeGuild.loadMembers();
+        }
         load();
     }
 
@@ -48,23 +60,11 @@ public class Scout {
                     "primary key (user_id, product_id, type))";
             Statement createSnipes = con.createStatement();
             createSnipes.executeUpdate(s1);
-
-            String s2 =
-                    "CREATE TABLE IF NOT EXISTS trackers (" +
-                    "user_id BIGINT, " +
-                    "product_id VARCHAR(32), " +
-                    "type VARCHAR(32), " +
-                    "last_price DOUBLE, " +
-                    "threshold DOUBLE," +
-                    "primary key (user_id, product_id, type))";
-            Statement createTrackers = con.createStatement();
-            createTrackers.executeUpdate(s2);
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("could not initialize tables, please restart");
         }
 
-        TrackerChecker.getInstance();
         SnipeChecker.getInstance().loadSnipes();
         RutgersCourseDatabase.getInstance();
 
