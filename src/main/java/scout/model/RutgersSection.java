@@ -2,7 +2,7 @@ package scout.model;
 
 import java.io.Serializable;
 
-public class RutgersSection implements Serializable {
+public class RutgersSection {
 
     private final String index;
     private final String title;
