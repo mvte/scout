@@ -61,7 +61,7 @@ public class Snipe extends Command {
 		EmbedBuilder eb = new EmbedBuilder()
 				.setTitle("successfully added snipe request")
 				.setThumbnail(Scout.bot.getSelfUser().getAvatarUrl())
-				.addField(snipe.getItemName(), "you will be notified when this item is available", false)
+				.addField(snipe.getItemName(), "you will be notified when this section is open", false)
 				.setFooter(event.getAuthor().getName())
 				.setTimestamp(java.time.Instant.now());
 		channel.sendMessageEmbeds(eb.build()).queue();
