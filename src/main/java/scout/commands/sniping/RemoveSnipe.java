@@ -5,9 +5,9 @@ import scout.commands.Command;
 import scout.commands.CommandCategory;
 import scout.sniper.SnipeChecker;
 import scout.sniper.SnipeFactory;
-import scout.model.URLType;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import scout.model.URLType;
 
 import java.util.List;
 
@@ -45,8 +45,15 @@ public class RemoveSnipe extends Command {
             return;
         }
 
-        realSnipe.getUsers().remove(userID);
         SnipeChecker.getInstance().clearEmptySnipes();
+
+        try {
+            SnipeChecker.getInstance().removeUserFromSnipe(userID, realSnipe);
+        } catch(Exception e) {
+            e.printStackTrace();
+            channel.sendMessage("something went wrong removing you from this snipe").queue();
+            return;
+        }
 
         EmbedBuilder eb = new EmbedBuilder()
                 .setTitle("successfully removed snipe request")

@@ -10,6 +10,7 @@ import scout.model.URLType;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -24,18 +25,15 @@ public class SnipeChecker {
     private static SnipeChecker INSTANCE;
     private HashSet<Snipe> snipes;
     private HashSet<CompletableFuture<Boolean>> stock;
-    private static int numInstances = 0;
 
     private SnipeChecker() {
         this.snipes = new HashSet<>();
         this.stock = new HashSet<>();
-        numInstances++;
     }
 
     public static synchronized SnipeChecker getInstance() {
         if(INSTANCE == null) {
             INSTANCE = new SnipeChecker();
-            System.out.println("num instances: " + numInstances);
         }
         return INSTANCE;
     }
@@ -74,7 +72,26 @@ public class SnipeChecker {
     }
 
     public void clearEmptySnipes() {
-        snipes.removeIf(s -> s.getUsers().isEmpty());
+        ArrayList<String> emptySnipes = new ArrayList<>();
+        snipes.removeIf(s -> {
+            if(s.getUsers().isEmpty()) {
+                emptySnipes.add(s.getUrl());
+                return true;
+            }
+            return false;
+        });
+
+        try {
+            Connection conn = DriverManager.getConnection(System.getenv("DB_URL"), System.getenv("DB_USER"), System.getenv("DB_PASS"));
+            PreparedStatement ps = conn.prepareStatement("DELETE FROM snipes WHERE product_id = ?");
+            for(String s : emptySnipes) {
+                ps.setString(1, s);
+                ps.execute();
+                ps.clearParameters();
+            }
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void checkSnipes() {
@@ -97,13 +114,13 @@ public class SnipeChecker {
             return;
         }
 
-        String stockMessage = snipe instanceof RutgersSnipe ? " **is open!**\n" : " **is in stock!**\n";
+        String stockMessage = " **is open!**\n";
         EmbedBuilder eb = new EmbedBuilder()
                 .setTitle(snipe.getItemName() + stockMessage)
                 .setThumbnail(Scout.bot.getSelfUser().getAvatarUrl())
-                .addField("now's your chance.", "press the button below to go to the item's webpage", false)
+                .addField("now's your chance.", "press the button below to go to register", false)
                 .setTimestamp(java.time.Instant.now());
-        ActionRow ar = ActionRow.of(Button.link(snipe.getUrl(), "go to"));
+        ActionRow ar = ActionRow.of(Button.link(snipe.getUrl(), "go to"), Button.primary("resnipe", "resnipe"));
 
         for(long user : snipe.getUsers()) {
             notifyUser(user, eb, ar);
@@ -138,11 +155,24 @@ public class SnipeChecker {
             System.getenv("DB_URL"), System.getenv("DB_USER"), System.getenv("DB_PASS")
         );
         conn.createStatement().executeUpdate(
-        "DELETE FROM snipes WHERE product_id = '" + snipe.getUrl() + "'"
+        "DELETE FROM snipes WHERE product_id = '" + snipe.getId() + "'"
         );
 
         //then remove from snipes
         snipes.remove(snipe);
+    }
+
+    public void removeUserFromSnipe(long userID, Snipe snipe) throws SQLException {
+        //first delete from database
+        Connection conn = DriverManager.getConnection(
+            System.getenv("DB_URL"), System.getenv("DB_USER"), System.getenv("DB_PASS")
+        );
+        conn.createStatement().executeUpdate(
+        "DELETE FROM snipes WHERE product_id = '" + snipe.getId() + "' AND user_id = " + userID
+        );
+
+        //then remove from snipes
+        snipe.getUsers().remove(userID);
     }
 
     /**
@@ -165,6 +195,7 @@ public class SnipeChecker {
 
                 Snipe snipe = factory.createSnipe(productID, true);
                 snipe.addUser(userID);
+                c++;
             }
             System.out.println("pulled " + c + " snipes from database, and created " + snipes.size() + " instances");
 
