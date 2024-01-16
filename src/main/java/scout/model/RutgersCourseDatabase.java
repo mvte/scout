@@ -12,8 +12,8 @@ import java.util.zip.GZIPInputStream;
 
 public class RutgersCourseDatabase {
 
-    private static final String coursesEndPoint = "https://sis.rutgers.edu/soc/api/courses.json?year=2023&term=9&campus=NB";
-    private static final String openSectionsEndPoint = "https://sis.rutgers.edu/soc/api/openSections.json?year=2023&term=9&campus=NB";
+    private static final String coursesEndPoint = "https://sis.rutgers.edu/soc/api/courses.json?year=2024&term=1&campus=NB";
+    private static final String openSectionsEndPoint = "https://sis.rutgers.edu/soc/api/openSections.json?year=2024&term=1&campus=NB";
     private static RutgersCourseDatabase INSTANCE;
     private static final boolean DEBUG = true;
     private JSONArray openSectionsList;
@@ -26,10 +26,14 @@ public class RutgersCourseDatabase {
             System.out.println("successfully connected to database ");
 
             System.out.println("creating table if not exists");
+            Statement dropTable = con.createStatement();
             Statement makeTable = con.createStatement();
 
-            String s = "CREATE TABLE IF NOT EXISTS rudb (id VARCHAR(10), section VARCHAR(10), title VARCHAR(255), PRIMARY KEY (id))";
-            makeTable.executeUpdate(s);
+            String drop = "DROP TABLE IF EXISTS rudb";
+            dropTable.executeUpdate(drop);
+
+            String make = "CREATE TABLE IF NOT EXISTS rudb (id VARCHAR(10), section VARCHAR(10), title VARCHAR(255), PRIMARY KEY (id))";
+            makeTable.executeUpdate(make);
 
             double time = load(con);
             System.out.println("loaded courses from endpoint in " + time + " seconds");
