@@ -3,14 +3,10 @@ package scout;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.Nullable;
 import scout.commands.*;
-import scout.commands.admin.ForceNotify;
 import scout.commands.admin.Initialize;
 import scout.commands.admin.Reload;
 import scout.commands.sniping.CheckSnipes;
 import scout.commands.sniping.RemoveSnipe;
-import scout.commands.tracking.CheckTrackers;
-import scout.commands.tracking.RemoveTracker;
-import scout.commands.tracking.Track;
 import scout.commands.sniping.Snipe;
 import static scout.commands.CommandCategory.*;
 
@@ -31,10 +27,6 @@ public class CommandManager {
         addCommand(new Snipe(SNIPER));
         addCommand(new CheckSnipes(SNIPER));
         addCommand(new RemoveSnipe(SNIPER));
-        addCommand(new Track(TRACKER));
-        addCommand(new CheckTrackers(TRACKER));
-        addCommand(new RemoveTracker(TRACKER));
-        addCommand(new ForceNotify(ADMIN));
         addCommand(new Reload(ADMIN));
         addCommand(new Initialize(ADMIN));
     }

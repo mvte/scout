@@ -7,7 +7,6 @@ import scout.commands.Command;
 import scout.commands.CommandCategory;
 import scout.model.URLType;
 import scout.sniper.Snipe;
-import scout.tracker.Tracker;
 
 import java.util.List;
 
@@ -50,14 +49,8 @@ public class Initialize extends Command {
     }
 
     private void initializeWelcome(MessageReceivedEvent event) {
-        String sniperInfo = "i can notify you whenever a product is in stock. all you need is a link to the product. currently," +
-                "i support sniping for the following websites: " + getSniperWebsites();
-        String courseInfo = "if you're a rutgers student, i can also notify you whenever a course opens up. all you need is the" +
-                "section index. for example, `04530` is the index for a section of cs111.";
-        String trackerInfo = "i can notify you whenever a product's price changes. all you need is a link to the product. currently," +
-                "i support tracking for the following websites: " + getTrackerWebsites();
-        String howInfo = "depending on the product, i either scrape information directly from the url you provide or i'll access the website's api. " +
-                "then, i'll periodically check the product's price/availability. snipes are checked every second, and trackers are checked every 5 minutes. ";
+        String courseInfo = "if you're a rutgers student, i can notify you whenever a course opens up. all you need is the" +
+                "section index. for example, `06570` is the index for a section of cs111.";
         String sourceCodeInfo = "if you _really_ wanna know how i work, i'm open source! you can check out my code [here](https://github.com/mvte/scout)";
         String supportInfo = "i'm still in development, so i might not be perfect. if you have any questions, feel free to ask in general. " +
                 "if you find any bugs, please report them to any of our admins. if you have any suggestions, feel free to suggest them in general.";
@@ -73,13 +66,9 @@ public class Initialize extends Command {
         infoEb.setTitle("info")
                 .setThumbnail(event.getGuild().getIconUrl())
                 .setDescription("here's what i do")
-                .addField("sniper", sniperInfo, false)
-                .addField("course sniper", courseInfo, false)
-                .addField("tracker", trackerInfo, false);
-
+                .addField("course sniper", courseInfo, false);
         EmbedBuilder howEb = new EmbedBuilder();
         howEb.setTitle("how do i work?")
-                .setDescription(howInfo)
                 .addField("source code", sourceCodeInfo, false)
                 .addField("support", supportInfo, false);
 
@@ -92,14 +81,6 @@ public class Initialize extends Command {
             websites.append(url.name().toLowerCase()).append(", ");
         }
 
-        return websites.substring(0, websites.length() - 2);
-    }
-
-    private String getTrackerWebsites() {
-        StringBuilder websites = new StringBuilder();
-        for(URLType url : Tracker.SUPPORTED_TRACKERS) {
-            websites.append(url.name().toLowerCase()).append(", ");
-        }
         return websites.substring(0, websites.length() - 2);
     }
 

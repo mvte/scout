@@ -18,12 +18,6 @@ public class SnipeFactory {
 
         Snipe snipe;
         switch(url) {
-//            case BESTBUY:
-//                snipe = new BestBuySnipe(urlString);
-//                break;
-//            case GAMESTOP:
-//                snipe = new GameStopSnipe(urlString);
-//                break;
             case RUTGERS:
                 snipe = new RutgersSnipe(urlString);
                 break;
