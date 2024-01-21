@@ -1,9 +1,16 @@
 package scout;
 
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import scout.sniper.SnipeFactory;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.util.Objects;
 
 public class Listener extends ListenerAdapter {
 
@@ -33,8 +40,47 @@ public class Listener extends ListenerAdapter {
     }
 
     @Override
+    public void onButtonInteraction(ButtonInteractionEvent event) {
+        if(event.getComponentId().startsWith("resnipe:")) {
+            SnipeFactory snipeFactory = new SnipeFactory();
+            String idx = event.getComponentId().substring("resnipe:".length());
+            long userID = event.getUser().getIdLong();
+
+
+            scout.sniper.Snipe snipe = snipeFactory.createSnipe(idx, true);
+            if (snipe == null) {
+                event.getChannel().sendMessage("something went wrong creating your snipe! check your url?").queue();
+                return;
+            }
+            if(snipe.getUsers().contains(userID)) {
+                event.getChannel().sendMessage("you are already sniping this item!").queue();
+                return;
+            }
+            snipe.getUsers().add(userID);
+
+            try {
+                Connection conn = DriverManager.getConnection(
+                        System.getenv("DB_URL"), System.getenv("DB_USER"), System.getenv("DB_PASS"));
+                String insert = "INSERT INTO snipes VALUES (?, ?, ?)";
+                PreparedStatement stmt = conn.prepareStatement(insert);
+                stmt.setLong(1, userID);
+                stmt.setString(2, idx);
+                stmt.setString(3, snipe.getUrlType().toString());
+                stmt.executeUpdate();
+            } catch(Exception e) {
+                e.printStackTrace();
+                event.getChannel().sendMessage("something went wrong adding your snipe! (").queue();
+            }
+
+            event.getChannel().sendMessage("you are now resniping " + snipe.getId()).queue();
+            event.deferEdit().queue();
+        }
+    }
+
+    @Override
     public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
-        event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRoleById(MEMBER_ROLE)).queue();
+        System.out.println("member joined: " + event.getMember().getId());
+        event.getGuild().addRoleToMember(event.getMember(), Objects.requireNonNull(event.getGuild().getRoleById(MEMBER_ROLE))).queue();
     }
 
 }

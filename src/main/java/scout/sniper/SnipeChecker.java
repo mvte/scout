@@ -120,7 +120,7 @@ public class SnipeChecker {
                 .setThumbnail(Scout.bot.getSelfUser().getAvatarUrl())
                 .addField("now's your chance.", "press the button below to go to register", false)
                 .setTimestamp(java.time.Instant.now());
-        ActionRow ar = ActionRow.of(Button.link(snipe.getUrl(), "go to"), Button.primary("resnipe", "resnipe"));
+        ActionRow ar = ActionRow.of(Button.link(snipe.getUrl(), "go to"), Button.primary("resnipe:" + snipe.getId(), "resnipe"));
 
         for(long user : snipe.getUsers()) {
             notifyUser(user, eb, ar);
